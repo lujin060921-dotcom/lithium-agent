@@ -38,7 +38,18 @@ with st.sidebar:
     delta_pct = st.slider("原材料价格单边变动幅度（涨跌双向并列）", 0, 50, 15, step=1) / 100.0
     bidirectional = st.toggle("涨跌双向并列分析", value=True, help="框架 2.2：涨价转嫁系数与下跌红利释放系数为两套参数，必须分别测算")
     as_of = st.text_input("基准日期（留空取最新报价）", value="")
-    use_llm = st.toggle("调用大模型生成报告", value=not settings.offline)
+    api_key = st.text_input(
+        "（可选）DeepSeek API Key",
+        type="password",
+        value="",
+        help="留空 = 离线确定性模式（免 Key，全部数值由工具计算，可复现）。填写并勾选下方开关后，可调用模型生成更流畅的报告文字；若 Key 无效或调用失败，会自动降级为离线确定性报告，不会中断。",
+    )
+    use_llm = st.toggle(
+        "调用大模型生成报告",
+        value=False,
+        disabled=not bool(api_key.strip()),
+        help="默认离线。需先在上方填写有效 API Key 才能启用；未填 Key 时保持离线确定性输出（稳定、免 Key、可复现）。",
+    )
     pdf_paths = [
         str(p) for p in sorted((DATA_DIR / "reports").glob("*.pdf"))
     ]
@@ -53,6 +64,11 @@ with st.sidebar:
 
 # ---------------- 主区 ----------------
 if run:
+    # 动态注入 API Key：默认离线（免 Key）；填写有效 Key 并勾选后才切 LLM 模式。
+    # config.settings 为进程内单例，LLMClient/缓存在构造时引用同一对象，故须先更新再建 Orchestrator。
+    key = (api_key or "").strip()
+    settings.api_key = key
+    settings.offline = not bool(key)
     request = AnalysisRequest(
         price_series=series,
         delta_pct=delta_pct,
