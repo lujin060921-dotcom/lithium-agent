@@ -1,0 +1,12 @@
+# 依赖清单（Python 3.11+，本项目在 Python 3.14.0 上验证通过）
+# 安装： .venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# PDF 解析（Tool 1）
+pymupdf==1.28.2
+
+# Web 界面入口
+streamlit==1.64.0
+pandas==3.0.6
+
+# 说明：Tool 2 检索与 Tool 3 计算仅使用 Python 标准库（csv / json / re / subprocess / urllib），
+# 不引入第三方依赖，以满足竞赛"指定环境可复现"要求。

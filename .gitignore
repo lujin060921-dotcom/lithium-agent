@@ -1,0 +1,15 @@
+# .env 含 API Key，禁止提交
+.env
+
+# 虚拟环境
+.venv/
+
+# 运行产物（可复现，不需要提交）
+logs/
+reports/
+__pycache__/
+*.pyc
+
+# 流式运行日志
+_st_out.log
+_st_err.log
